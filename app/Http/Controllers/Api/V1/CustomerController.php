@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\V1\CustomerCollection;
 use App\Http\Resources\V1\CustomerResource;
 use App\Models\Customer;
+use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
@@ -16,15 +17,8 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        return new CustomerCollection(Customer::paginate());
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return new CustomerCollection(Customer::with('invoices')->paginate());
+        // return Customer::with('invoices')->paginate();
     }
 
     /**
@@ -32,7 +26,7 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-        //
+        return new CustomerResource(Customer::create($request->all()));
     }
 
     /**
@@ -56,7 +50,9 @@ class CustomerController extends Controller
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        //
+        $customer->update($request->all());
+
+        return $customer;
     }
 
     /**
@@ -64,6 +60,8 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        //
+        $customer->delete();
+
+        return response("Customer has been deleted.", 204);
     }
 }
